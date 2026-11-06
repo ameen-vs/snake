@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LE3BA D ZEB - Cyber Neon Snake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --bg-card: rgba(15, 20, 38, 0.75);
+      --neon-cyan: #00f3ff;
+      --neon-pink: #ff007f;
+      --neon-purple: #9d00ff;
+      --neon-green: #00ff66;
+      --neon-yellow: #ffe600;
+      --neon-orange: #ff6a00;
+      --text-main: #f0f4fc;
+      --text-muted: #7b8ba5;
+      --glow-cyan: 0 0 15px rgba(0, 243, 255, 0.6), 0 0 35px rgba(0, 243, 255, 0.3);
+      --glow-pink: 0 0 15px rgba(255, 0, 127, 0.6), 0 0 35px rgba(255, 0, 127, 0.3);
+      --glow-purple: 0 0 15px rgba(157, 0, 255, 0.6), 0 0 35px rgba(157, 0, 255, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Ambient dynamic background lighting */
+    .ambient-glow-1, .ambient-glow-2, .ambient-glow-3 {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ambient-glow-1 {
+      width: 480px;
+      height: 480px;
+      background: var(--neon-cyan);
+      top: -100px;
+      left: -100px;
+      animation: floatOrb 14s ease-in-out infinite alternate;
+    }
+    .ambient-glow-2 {
+      width: 550px;
+      height: 550px;
+      background: var(--neon-pink);
+      bottom: -120px;
+      right: -100px;
+      animation: floatOrb 18s ease-in-out infinite alternate-reverse;
+    }
+    .ambient-glow-3 {
+      width: 400px;
+      height: 400px;
+      background: var(--neon-purple);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.2;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(80px, 60px) scale(1.15); }
+    }
+
+    /* Subtle Scanlines & Cyber Grid Overlay */
+    .cyber-overlay {
+      position: fixed;
+      inset: 0;
+      background: 
+        linear-gradient(rgba(18, 16, 38, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Main Container */
+    .app-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1560px;
+      padding: 14px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+      gap: 12px;
+    }
+
+    /* Header Section */
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 243, 255, 0.15);
+      border-radius: 14px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+      border-radius: 10px;
+      box-shadow: var(--glow-cyan);
+      font-size: 20px;
+    }
+
+    .game-title {
+      font-family: 'Orbitron', monospace, sans-serif;
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: 3px;
+      background: linear-gradient(90deg, #00f3ff, #ff007f, #ffe600, #00f3ff);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: neonFlow 8s linear infinite;
+      text-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    @keyframes neonFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .status-hud {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hud-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(8, 12, 24, 0.6);
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-width: 90px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .hud-card.pink::after {
+      background: var(--neon-pink);
+      box-shadow: var(--glow-pink);
+    }
+
+    .hud-card.yellow::after {
+      background: var(--neon-yellow);
+      box-shadow: 0 0 15px rgba(255, 230, 0, 0.6);
+    }
+
+    .hud-card.purple::after {
+      background: var(--neon-purple);
+      box-shadow: var(--glow-purple);
+    }
+
+    .hud-label {
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .hud-val {
+      font-family: 'Orbitron', monospace, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .combo-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(255, 0, 127, 0.2), rgba(157, 0, 255, 0.2));
+      border: 1px solid var(--neon-pink);
+      padding: 5px 14px;
+      border-radius: 20px;
+      box-shadow: var(--glow-pink);
+      animation: pulseCombo 0.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseCombo {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-cyber {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--neon-cyan);
+      border: 1px solid var(--neon-cyan);
+      padding: 7px 15px;
+      border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
+      text-transform: uppercase;
+    }
+
+    .btn-cyber:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+    }
+
+    .btn-cyber:active {
+      transform: translateY(0);
+    }
+
+    .btn-cyber.active {
+      background: var(--neon-cyan);
+      color: #04060c;
+    }
+
+    /* Game Area Canvas Container - Wide & Expansive */
+    .game-arena-wrapper {
+      position: relative;
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, rgba(14, 21, 46, 0.5) 0%, rgba(6, 8, 18, 0.95) 100%);
+      border-radius: 18px;
+      border: 2px solid rgba(0, 243, 255, 0.25);
+      box-shadow: 0 0 40px rgba(0, 243, 255, 0.12), inset 0 0 50px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      min-height: 480px;
+      max-height: calc(100vh - 210px);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    canvas#gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      image-rendering: pixelated;
+    }
+
+    /* Canvas Overlays (Start, Pause, Game Over) */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 9, 20, 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', monospace, sans-serif;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #fff;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .modal-title.cyber-pink {
+      color: var(--neon-pink);
+      text-shadow: var(--glow-pink);
+    }
+
+    .modal-title.cyber-cyan {
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .modal-sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    .powerup-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .btn-huge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 14px 45px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-huge:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 45px rgba(0, 243, 255, 0.8), 0 0 20px rgba(157, 0, 255, 0.6);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-top: 4px;
+    }
+
+    /* Mobile Virtual D-Pad (only when touched or on narrow screens) */
+    .mobile-controls {
+      display: none;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+      z-index: 5;
+    }
+
+    .dpad-cross {
+      display: grid;
+      grid-template-columns: repeat(3, 54px);
+      grid-template-rows: repeat(3, 54px);
+      gap: 6px;
+    }
+
+    .dpad-btn {
+      background: rgba(20, 28, 54, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    .dpad-btn:active {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .dpad-up { grid-column: 2; grid-row: 1; }
+    .dpad-left { grid-column: 1; grid-row: 2; }
+    .dpad-right { grid-column: 3; grid-row: 2; }
+    .dpad-down { grid-column: 2; grid-row: 3; }
+
+    @media (max-width: 860px) {
+      .mobile-controls {
+        display: flex;
+      }
+      .hud-card {
+        min-width: 72px;
+        padding: 4px 10px;
+      }
+      .hud-val {
+        font-size: 1.05rem;
+      }
+    }
+
+    /* Footer Section */
+    footer {
+      width: 100%;
+      max-width: 1560px;
+      padding: 10px 24px 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .credits-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.92rem;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: #d1dcfa;
+      background: rgba(14, 20, 38, 0.65);
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 30px;
+      padding: 6px 18px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .credits-tag .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon-pink);
+      box-shadow: var(--glow-pink);
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.6); opacity: 1; }
+    }
+
+    .credits-tag .highlight-amine {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+    }
+
+    .credits-tag .highlight-haytam {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 10px rgba(255, 230, 0, 0.7);
+    }
+
+    .tips-tag {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .key-cap {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+
+    /* Screen Shake Container */
+    .shake {
+      animation: screenShake 0.25s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes screenShake {
+      10%, 90% { transform: translate3d(-2px, 1px, 0); }
+      20%, 80% { transform: translate3d(3px, -2px, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 3px, 0); }
+      40%, 60% { transform: translate3d(4px, -3px, 0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Dynamic Ambient Glowing Orbs -->
+  <div class="ambient-glow-1" id="amb1"></div>
+  <div class="ambient-glow-2" id="amb2"></div>
+  <div class="ambient-glow-3" id="amb3"></div>
+  <div class="cyber-overlay"></div>
+
+  <div class="app-wrapper">
+    <!-- Top Modern Neon Header -->
+    <header>
+      <div class="title-group">
+        <div class="logo-badge">⚡</div>
+        <div>
+          <h1 class="game-title">LE3BA D ZEB</h1>
+        </div>
+      </div>
+
+      <!-- Live Game HUD -->
+      <div class="status-hud">
+        <div class="hud-card">
+          <span class="hud-label">Score</span>
+          <span class="hud-val" id="scoreVal">0</span>
+        </div>
+
+        <div class="hud-card pink">
+          <span class="hud-label">Best</span>
+          <span class="hud-val" id="highScoreVal">0</span>
+        </div>
+
+        <div class="hud-card yellow">
+          <span class="hud-label">Speed</span>
+          <span class="hud-val" id="speedVal">1.0x</span>
+        </div>
+
+        <div class="hud-card purple">
+          <span class="hud-label">Orbs</span>
+          <span class="hud-val" id="eatenVal">0</span>
+        </div>
+
+        <div class="combo-badge" id="comboBadge">
+          <span style="font-size: 1.1rem;">🔥</span>
+          <span style="font-family:'Orbitron'; font-weight:700; color:#fff;" id="comboText">COMBO x2</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="controls-panel">
+        <button class="btn-cyber" id="soundToggleBtn" title="Toggle Synth Audio">
+          <span id="soundIcon">🔊</span> SOUND
+        </button>
+        <button class="btn-cyber" id="wallModeBtn" title="Toggle Wall Wrap Mode">
+          <span id="wallIcon">🛡️</span> WRAP: ON
+        </button>
+        <button class="btn-cyber" id="pauseBtn" title="Pause Game (Space / P)">
+          <span>⏸️</span> PAUSE
+        </button>
+      </div>
+    </header>
+
+    <!-- Expansive Arena Canvas -->
+    <div class="game-arena-wrapper" id="arenaWrapper">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Start Overlay -->
+      <div class="modal-overlay active" id="startOverlay">
+        <h2 class="modal-title cyber-cyan">LE3BA D ZEB</h2>
+        <p class="modal-sub">
+          Feed the neon viper! Every target you devour triggers dynamic shockwaves, 
+          hyper-energy pulses, particle supernovas, and reality-bending powerups!
+        </p>
+
+        <div class="powerup-legend">
+          <div class="legend-item">
+            <span class="legend-dot" style="background:#00f3ff; box-shadow:0 0 10px #00f3ff;"></span>
+            <span>Neon Core (+100)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background:#ffe600; box-shadow:0 0 10px #ffe600;"></span>
+            <span>Quantum Glitch (x2 Score)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background:#ff007f; box-shadow:0 0 10px #ff007f;"></span>
+            <span>Supernova Blast (+Shockwave)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background:#9d00ff; box-shadow:0 0 10px #9d00ff;"></span>
+            <span>Time Warp (Slow Motion)</span>
+          </div>
+        </div>
+
+        <button class="btn-huge" id="startBtn">
+          <span>INITIALIZE</span> ⚡
+        </button>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div class="modal-overlay" id="gameOverOverlay">
+        <h2 class="modal-title cyber-pink">CYBER TERMINATED</h2>
+        <p class="modal-sub" id="deathReason">Neural connection severed. System crash detected.</p>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="hud-label">Final Score</div>
+            <div class="stat-num" id="finalScore">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="hud-label">Max Combo</div>
+            <div class="stat-num" id="finalCombo" style="color:var(--neon-pink);">0x</div>
+          </div>
+          <div class="stat-box">
+            <div class="hud-label">Targets Devoured</div>
+            <div class="stat-num" id="finalDevoured" style="color:var(--neon-yellow);">0</div>
+          </div>
+        </div>
+
+        <button class="btn-huge" id="restartBtn">
+          <span>REBOOT SYSTEM</span> 🔄
+        </button>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div class="modal-overlay" id="pauseOverlay">
+        <h2 class="modal-title cyber-cyan">SYSTEM PAUSED</h2>
+        <p class="modal-sub">Neural link standby. Take a breath, legend.</p>
+        <button class="btn-huge" id="resumeBtn">
+          <span>RESUME</span> ▶
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Virtual Controls -->
+    <div class="mobile-controls">
+      <div class="dpad-cross">
+        <button class="dpad-btn dpad-up" id="dpadUp">▲</button>
+        <button class="dpad-btn dpad-left" id="dpadLeft">◀</button>
+        <button class="dpad-btn dpad-right" id="dpadRight">▶</button>
+        <button class="dpad-btn dpad-down" id="dpadDown">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modernised Footer -->
+  <footer>
+    <div class="credits-tag">
+      <div class="pulse-dot"></div>
+      <span>PRODUCED by <strong class="highlight-amine">AMINE</strong>, IDEA by <strong class="highlight-haytam">Haytam</strong></span>
+    </div>
+
+    <div class="tips-tag">
+      <span><span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span> or <span class="key-cap">↑</span><span class="key-cap">←</span><span class="key-cap">↓</span><span class="key-cap">→</span> Move</span>
+      <span><span class="key-cap">SPACE</span> Pause</span>
+      <span><span class="key-cap">M</span> Mute</span>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+     *  SYNTHESIZED WEB AUDIO ENGINE (Zero external dependencies)
+     * ========================================================= */
+    class NeonAudio {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1, pitchDecay = 0) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        if (pitchDecay !== 0) {
+          osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq + pitchDecay), now + duration);
+        }
+
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+
+      playEat(combo = 1, specialType = null) {
+        if (!this.enabled) return;
+        this.init();
+
+        const baseFreq = 320 + Math.min(combo * 45, 650);
+        
+        if (specialType === 'quantum') {
+          // Arpeggiated high-tech chord
+          [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2].forEach((f, idx) => {
+            setTimeout(() => this.playTone(f, 'square', 0.12, 0.08, 120), idx * 40);
+          });
+        } else if (specialType === 'supernova') {
+          // Heavy bass hit + sweeping high resonance
+          this.playTone(85, 'sawtooth', 0.35, 0.25, -40);
+          this.playTone( baseFreq * 1.6, 'triangle', 0.25, 0.12, 300);
+        } else if (specialType === 'timewarp') {
+          // Sci-fi downward slow pitch
+          this.playTone(700, 'sine', 0.4, 0.15, -450);
+        } else {
+          // Crispy neon blip
+          this.playTone(baseFreq, 'sine', 0.1, 0.14, 180);
+          this.playTone(baseFreq * 1.5, 'triangle', 0.14, 0.08, 50);
+        }
+      }
+
+      playCrash() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        
+        // Low distorted bass rumble
+        this.playTone(120, 'sawtooth', 0.6, 0.3, -80);
+        this.playTone(60, 'square', 0.8, 0.25, -30);
+      }
+
+      playTurn() {
+        if (!this.enabled) return;
+        this.playTone(620, 'sine', 0.03, 0.015, -100);
+      }
+
+      playElectricZap() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(900 + Math.random() * 300, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.14);
+        gain.gain.setValueAtTime(0.09, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
+      }
+
+      playPowerupActive() {
+        if (!this.enabled) return;
+        [440, 554, 659, 880].forEach((f, idx) => {
+          setTimeout(() => this.playTone(f, 'sine', 0.15, 0.08), idx * 50);
+        });
+      }
+    }
+
+    /* =========================================================
+     *  PARTICLE & SHOCKWAVE VISUAL FX SYSTEM
+     * ========================================================= */
+    class Shockwave {
+      constructor(x, y, color = '#00f3ff', maxRadius = 140, duration = 0.5) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.radius = 4;
+        this.maxRadius = maxRadius;
+        this.duration = duration;
+        this.life = 0;
+      }
+
+      update(dt) {
+        this.life += dt;
+        const progress = this.life / this.duration;
+        this.radius = 4 + (this.maxRadius - 4) * Math.sin(progress * (Math.PI / 2));
+        return this.life < this.duration;
+      }
+
+      draw(ctx) {
+        const progress = this.life / this.duration;
+        const alpha = Math.max(0, 1 - progress);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = Math.max(1, 4 * (1 - progress));
+        ctx.globalAlpha = alpha;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 220 + 80;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.radius = Math.random() * 3.5 + 2;
+        this.life = 0;
+        this.duration = Math.random() * 0.4 + 0.45;
+        this.drag = 0.94;
+      }
+
+      update(dt) {
+        this.life += dt;
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.vx *= this.drag;
+        this.vy *= this.drag;
+        return this.life < this.duration;
+      }
+
+      draw(ctx) {
+        const progress = this.life / this.duration;
+        const alpha = 1 - progress;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, Math.max(0.1, this.radius * (1 - progress * 0.7)), 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 12;
+        ctx.globalAlpha = alpha;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class FloatingText {
+      constructor(text, x, y, color = '#ffe600') {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.life = 0;
+        this.duration = 0.9;
+        this.vy = -55;
+      }
+
+      update(dt) {
+        this.life += dt;
+        this.y += this.vy * dt;
+        return this.life < this.duration;
+      }
+
+      draw(ctx) {
+        const progress = this.life / this.duration;
+        const alpha = Math.max(0, 1 - progress);
+        ctx.save();
+        ctx.font = '900 16px "Orbitron", sans-serif';
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 12;
+        ctx.globalAlpha = alpha;
+        ctx.textAlign = 'center';
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    class LightningArc {
+      constructor(x1, y1, x2, y2, color = '#00f3ff', segmentsCount = 7) {
+        this.color = color;
+        this.points = [];
+        this.life = 0;
+        this.duration = 0.22;
+        this.generate(x1, y1, x2, y2, segmentsCount);
+      }
+
+      generate(x1, y1, x2, y2, segmentsCount) {
+        this.points.push({ x: x1, y: y1 });
+        const dx = (x2 - x1) / segmentsCount;
+        const dy = (y2 - y1) / segmentsCount;
+        const dist = Math.hypot(x2 - x1, y2 - y1);
+        const maxOffset = Math.min(32, dist * 0.25);
+
+        for (let i = 1; i < segmentsCount; i++) {
+          const normalAngle = Math.atan2(dy, dx) + Math.PI / 2;
+          const offset = (Math.random() - 0.5) * 2 * maxOffset;
+          const px = x1 + dx * i + Math.cos(normalAngle) * offset;
+          const py = y1 + dy * i + Math.sin(normalAngle) * offset;
+          this.points.push({ x: px, y: py });
+        }
+        this.points.push({ x: x2, y: y2 });
+      }
+
+      update(dt) {
+        this.life += dt;
+        return this.life < this.duration;
+      }
+
+      draw(ctx) {
+        const progress = this.life / this.duration;
+        const alpha = Math.max(0, 1 - progress);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i = 1; i < this.points.length; i++) {
+          ctx.lineTo(this.points[i].x, this.points[i].y);
+        }
+        // Bright hot inner core
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.8;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 16;
+        ctx.globalAlpha = alpha;
+        ctx.stroke();
+
+        // Neon outer aura
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 4;
+        ctx.globalAlpha = alpha * 0.7;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    /* =========================================================
+     *  MAIN GAME ENGINE - LE3BA D ZEB
+     * ========================================================= */
+    class CyberSnakeGame {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.arenaWrapper = document.getElementById('arenaWrapper');
+        this.audio = new NeonAudio();
+
+        // UI Element References
+        this.scoreValEl = document.getElementById('scoreVal');
+        this.highScoreValEl = document.getElementById('highScoreVal');
+        this.speedValEl = document.getElementById('speedVal');
+        this.eatenValEl = document.getElementById('eatenVal');
+        this.comboBadgeEl = document.getElementById('comboBadge');
+        this.comboTextEl = document.getElementById('comboText');
+
+        // Overlays
+        this.startOverlay = document.getElementById('startOverlay');
+        this.gameOverOverlay = document.getElementById('gameOverOverlay');
+        this.pauseOverlay = document.getElementById('pauseOverlay');
+        this.deathReasonEl = document.getElementById('deathReason');
+        this.finalScoreEl = document.getElementById('finalScore');
+        this.finalComboEl = document.getElementById('finalCombo');
+        this.finalDevouredEl = document.getElementById('finalDevoured');
+
+        // Buttons
+        this.startBtn = document.getElementById('startBtn');
+        this.restartBtn = document.getElementById('restartBtn');
+        this.resumeBtn = document.getElementById('resumeBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
+        this.soundToggleBtn = document.getElementById('soundToggleBtn');
+        this.wallModeBtn = document.getElementById('wallModeBtn');
+        this.soundIcon = document.getElementById('soundIcon');
+        this.wallIcon = document.getElementById('wallIcon');
+
+        // Grid & Sizing Configuration
+        this.gridSize = 24; // Pixel size per cell
+        this.cols = 40;
+        this.rows = 24;
+
+        // Game State Variables
+        this.isRunning = false;
+        this.isPaused = false;
+        this.wrapWalls = true;
+        this.score = 0;
+        this.highScore = parseInt(localStorage.getItem('le3ba_highScore')) || 0;
+        this.highScoreValEl.textContent = this.highScore;
+        this.targetsEaten = 0;
+
+        // Speed & Stepping
+        this.baseSpeed = 9; // steps per second
+        this.currentSpeed = this.baseSpeed;
+        this.stepInterval = 1 / this.currentSpeed;
+        this.accumulator = 0;
+        this.lastTime = 0;
+
+        // Combo system
+        this.combo = 0;
+        this.comboTimer = 0;
+        this.comboTimeout = 3.5; // seconds
+        this.maxComboReached = 0;
+
+        // Special Powerup Timers
+        this.timeWarpTimer = 0;
+        this.scoreMultiplier = 1;
+        this.multiplierTimer = 0;
+
+        // Entities
+        this.snake = [];
+        this.direction = { x: 1, y: 0 };
+        this.nextDirection = { x: 1, y: 0 };
+        this.inputQueue = [];
+        this.target = null;
+        this.spineWave = 0; // Wave animation for eating ripple down snake
+
+        // FX Collections
+        this.particles = [];
+        this.shockwaves = [];
+        this.lightnings = [];
+        this.floatingTexts = [];
+        this.ambientZapTimer = 0;
+
+        // Ambient Color Cycle (Dynamically reacts to game state)
+        this.hueShift = 180; // cyan start
+        this.gridOffset = 0;
+
+        // Setup Event Listeners & Canvas
+        this.initEventListeners();
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        // Kick off requestAnimationFrame render loop
+        requestAnimationFrame((t) => this.loop(t));
+      }
+
+      resize() {
+        const rect = this.arenaWrapper.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+
+        // Determine dynamic grid columns and rows based on container aspect ratio
+        // Maintain a generous, wide arcade playfield
+        const targetCellSize = Math.max(18, Math.min(28, Math.floor(rect.width / 42)));
+        this.gridSize = targetCellSize;
+        this.cols = Math.floor(rect.width / this.gridSize);
+        this.rows = Math.floor(rect.height / this.gridSize);
+
+        // Center the playing field inside canvas
+        this.offsetX = Math.floor((rect.width - this.cols * this.gridSize) / 2);
+        this.offsetY = Math.floor((rect.height - this.rows * this.gridSize) / 2);
+      }
+
+      initEventListeners() {
+        // Keyboard controls
+        window.addEventListener('keydown', (e) => this.handleKeyDown(e));
+
+        // Start / Restart / Pause Buttons
+        this.startBtn.addEventListener('click', () => {
+          this.audio.init();
+          this.startGame();
+        });
+        this.restartBtn.addEventListener('click', () => {
+          this.audio.init();
+          this.startGame();
+        });
+        this.resumeBtn.addEventListener('click', () => this.togglePause());
+        this.pauseBtn.addEventListener('click', () => this.togglePause());
+
+        // Sound Toggle
+        this.soundToggleBtn.addEventListener('click', () => {
+          this.audio.enabled = !this.audio.enabled;
+          this.soundIcon.textContent = this.audio.enabled ? '🔊' : '🔇';
+          this.soundToggleBtn.classList.toggle('active', !this.audio.enabled);
+        });
+
+        // Wall Mode Toggle
+        this.wallModeBtn.addEventListener('click', () => {
+          this.wrapWalls = !this.wrapWalls;
+          this.wallIcon.textContent = this.wrapWalls ? '🛡️' : '⚡';
+          this.wallModeBtn.innerHTML = `<span>${this.wallIcon.textContent}</span> WRAP: ${this.wrapWalls ? 'ON' : 'OFF'}`;
+        });
+
+        // Mobile D-Pad
+        const dpadMap = {
+          dpadUp: { x: 0, y: -1 },
+          dpadDown: { x: 0, y: 1 },
+          dpadLeft: { x: -1, y: 0 },
+          dpadRight: { x: 1, y: 0 }
+        };
+        Object.keys(dpadMap).forEach((id) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          const handler = (e) => {
+            e.preventDefault();
+            this.setDirection(dpadMap[id].x, dpadMap[id].y);
+          };
+          btn.addEventListener('touchstart', handler, { passive: false });
+          btn.addEventListener('click', handler);
+        });
+
+        // Touch Swipe Gesture detection on canvas
+        let touchStartX = 0;
+        let touchStartY = 0;
+        this.canvas.addEventListener('touchstart', (e) => {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        this.canvas.addEventListener('touchend', (e) => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          const dy = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(dx) > 25 || Math.abs(dy) > 25) {
+            if (Math.abs(dx) > Math.abs(dy)) {
+              this.setDirection(dx > 0 ? 1 : -1, 0);
+            } else {
+              this.setDirection(0, dy > 0 ? 1 : -1);
+            }
+          }
+        }, { passive: true });
+      }
+
+      handleKeyDown(e) {
+        const key = e.key.toLowerCase();
+
+        if (key === ' ' || key === 'p') {
+          if (this.isRunning) {
+            this.togglePause();
+            e.preventDefault();
+          } else if (this.startOverlay.classList.contains('active')) {
+            this.startGame();
+            e.preventDefault();
+          } else if (this.gameOverOverlay.classList.contains('active')) {
+            this.startGame();
+            e.preventDefault();
+          }
+          return;
+        }
+
+        if (key === 'm') {
+          this.soundToggleBtn.click();
+          return;
+        }
+
+        if (['arrowup', 'w'].includes(key)) {
+          this.setDirection(0, -1);
+          e.preventDefault();
+        } else if (['arrowdown', 's'].includes(key)) {
+          this.setDirection(0, 1);
+          e.preventDefault();
+        } else if (['arrowleft', 'a'].includes(key)) {
+          this.setDirection(-1, 0);
+          e.preventDefault();
+        } else if (['arrowright', 'd'].includes(key)) {
+          this.setDirection(1, 0);
+          e.preventDefault();
+        }
+      }
+
+      setDirection(x, y) {
+        if (!this.isRunning || this.isPaused) return;
+        const lastDir = this.inputQueue.length > 0 
+          ? this.inputQueue[this.inputQueue.length - 1] 
+          : this.direction;
+
+        // Prevent 180-degree instant reversal into own body
+        if (x !== 0 && lastDir.x !== 0) return;
+        if (y !== 0 && lastDir.y !== 0) return;
+
+        if (this.inputQueue.length < 3) {
+          this.inputQueue.push({ x, y });
+          this.audio.playTurn();
+        }
+      }
+
+      startGame() {
+        this.resize();
+        this.isRunning = true;
+        this.isPaused = false;
+        this.score = 0;
+        this.targetsEaten = 0;
+        this.combo = 0;
+        this.comboTimer = 0;
+        this.maxComboReached = 0;
+        this.scoreMultiplier = 1;
+        this.multiplierTimer = 0;
+        this.timeWarpTimer = 0;
+        this.currentSpeed = this.baseSpeed;
+        this.stepInterval = 1 / this.currentSpeed;
+        this.accumulator = 0;
+        this.spineWave = 0;
+
+        // Hide overlays
+        this.startOverlay.classList.remove('active');
+        this.gameOverOverlay.classList.remove('active');
+        this.pauseOverlay.classList.remove('active');
+        this.updateHUD();
+
+        // Initialize Snake in Center
+        const startX = Math.floor(this.cols / 2);
+        const startY = Math.floor(this.rows / 2);
+        this.snake = [
+          { x: startX, y: startY },
+          { x: startX - 1, y: startY },
+          { x: startX - 2, y: startY },
+          { x: startX - 3, y: startY }
+        ];
+
+        this.direction = { x: 1, y: 0 };
+        this.nextDirection = { x: 1, y: 0 };
+        this.inputQueue = [];
+
+        // Clean effects
+        this.particles = [];
+        this.shockwaves = [];
+        this.lightnings = [];
+        this.floatingTexts = [];
+        this.ambientZapTimer = 0;
+
+        // Spawn first Target
+        this.spawnTarget();
+
+        // Audio flourish
+        this.audio.playPowerupActive();
+      }
+
+      togglePause() {
+        if (!this.isRunning) return;
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+          this.pauseOverlay.classList.add('active');
+        } else {
+          this.pauseOverlay.classList.remove('active');
+        }
+      }
+
+      spawnTarget() {
+        let valid = false;
+        let candidate = { x: 0, y: 0 };
+
+        while (!valid) {
+          candidate.x = Math.floor(Math.random() * this.cols);
+          candidate.y = Math.floor(Math.random() * this.rows);
+          valid = !this.snake.some(seg => seg.x === candidate.x && seg.y === candidate.y);
+        }
+
+        // Target Types:
+        // 70% Normal Neon Core
+        // 12% Quantum Glitch (multiplier & high score)
+        // 10% Supernova Blast (massive explosion & tail wave)
+        // 8% Time Warp (slow motion zen)
+        const rand = Math.random();
+        let type = 'normal';
+        let color = '#00f3ff';
+        let points = 100;
+
+        if (rand > 0.92) {
+          type = 'timewarp';
+          color = '#9d00ff';
+          points = 250;
+        } else if (rand > 0.82) {
+          type = 'supernova';
+          color = '#ff007f';
+          points = 300;
+        } else if (rand > 0.70) {
+          type = 'quantum';
+          color = '#ffe600';
+          points = 200;
+        }
+
+        this.target = {
+          x: candidate.x,
+          y: candidate.y,
+          type,
+          color,
+          points,
+          pulse: 0,
+          spawnTime: performance.now()
+        };
+      }
+
+      /* =========================================================
+       *  CREATIVE EAT LOGIC: When Snake Devours the Target!
+       * ========================================================= */
+      onEatTarget() {
+        const t = this.target;
+        this.targetsEaten++;
+
+        // 1. Combo Progression
+        this.combo++;
+        this.comboTimer = this.comboTimeout;
+        if (this.combo > this.maxComboReached) {
+          this.maxComboReached = this.combo;
+        }
+
+        // Calculate score with combo and powerup multipliers
+        const comboBonusMultiplier = 1 + (this.combo - 1) * 0.4;
+        const earnedPoints = Math.round(t.points * comboBonusMultiplier * this.scoreMultiplier);
+        this.score += earnedPoints;
+
+        if (this.score > this.highScore) {
+          this.highScore = this.score;
+          localStorage.setItem('le3ba_highScore', this.highScore);
+        }
+
+        // 2. Play Audio with pitch escalation
+        this.audio.playEat(this.combo, t.type);
+
+        // Target World Coordinates for Visual FX
+        const targetPixelX = this.offsetX + (t.x + 0.5) * this.gridSize;
+        const targetPixelY = this.offsetY + (t.y + 0.5) * this.gridSize;
+
+        // 3. Creative Effect: Neon Particle Supernova Explosion
+        const particleCount = t.type === 'supernova' ? 65 : 30;
+        for (let i = 0; i < particleCount; i++) {
+          this.particles.push(new Particle(targetPixelX, targetPixelY, t.color));
+        }
+
+        // 3b. Creative Effect: Electric Neon Lightning Arcs
+        this.audio.playElectricZap();
+        const arcCount = t.type === 'supernova' ? 8 : 4;
+        for (let i = 0; i < arcCount; i++) {
+          let destX, destY;
+          if (i === 0 && this.snake.length > 0) {
+            // Arc directly to snake head
+            destX = this.offsetX + (this.snake[0].x + 0.5) * this.gridSize;
+            destY = this.offsetY + (this.snake[0].y + 0.5) * this.gridSize;
+          } else if (i < 3 && this.snake.length > 2) {
+            // Arc to random snake body segment
+            const seg = this.snake[Math.floor(Math.random() * this.snake.length)];
+            destX = this.offsetX + (seg.x + 0.5) * this.gridSize;
+            destY = this.offsetY + (seg.y + 0.5) * this.gridSize;
+          } else {
+            // Arc outwards into cyberspace
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 150 + 60;
+            destX = targetPixelX + Math.cos(angle) * dist;
+            destY = targetPixelY + Math.sin(angle) * dist;
+          }
+          this.lightnings.push(new LightningArc(targetPixelX, targetPixelY, destX, destY, t.color, 7));
+        }
+
+        // 4. Creative Effect: Shockwave Expansion Warp Ring
+        const shockRadius = t.type === 'supernova' ? 260 : 130;
+        this.shockwaves.push(new Shockwave(targetPixelX, targetPixelY, t.color, shockRadius, 0.45));
+
+        // 5. Creative Effect: Floating Neon Damage/Score Popup
+        const comboStr = this.combo > 1 ? ` (x${this.combo} STREAK!)` : '';
+        this.floatingTexts.push(new FloatingText(`+${earnedPoints}${comboStr}`, targetPixelX, targetPixelY - 10, t.color));
+
+        // 6. Creative Effect: Snake Spine Luminescence Pulse
+        // A radiant glowing wave travels down snake's body from head to tail
+        this.spineWave = this.snake.length;
+
+        // 7. Creative Effect: Screen Micro-Shake on impact
+        this.arenaWrapper.classList.remove('shake');
+        void this.arenaWrapper.offsetWidth; // trigger reflow
+        this.arenaWrapper.classList.add('shake');
+
+        // 8. Creative Effect: Ambient Lighting dynamic shift
+        this.shiftAmbientGlow(t.color);
+
+        // 9. Specific Powerup Effects
+        if (t.type === 'quantum') {
+          this.scoreMultiplier = 2;
+          this.multiplierTimer = 6.0;
+          this.floatingTexts.push(new FloatingText(`HYPER DRIVE 2X ACTIVE!`, targetPixelX, targetPixelY - 35, '#ffe600'));
+        } else if (t.type === 'supernova') {
+          // Extra shockwave ripple across the whole screen
+          setTimeout(() => {
+            this.shockwaves.push(new Shockwave(this.canvas.width / 2, this.canvas.height / 2, '#ff007f', 400, 0.6));
+          }, 100);
+        } else if (t.type === 'timewarp') {
+          this.timeWarpTimer = 5.0;
+          this.floatingTexts.push(new FloatingText(`TIME DILATION ACTIVE`, targetPixelX, targetPixelY - 35, '#9d00ff'));
+        }
+
+        // 10. Progressive speed curve (capped to remain ultra fluid)
+        const baseCalculatedSpeed = this.baseSpeed + Math.min(this.targetsEaten * 0.22, 14);
+        this.currentSpeed = this.timeWarpTimer > 0 ? baseCalculatedSpeed * 0.65 : baseCalculatedSpeed;
+        this.stepInterval = 1 / this.currentSpeed;
+
+        // Spawn next target
+        this.spawnTarget();
+        this.updateHUD();
+      }
+
+      shiftAmbientGlow(color) {
+        const amb1 = document.getElementById('amb1');
+        const amb2 = document.getElementById('amb2');
+        if (amb1) amb1.style.background = color;
+        if (amb2) amb2.style.background = color === '#00f3ff' ? '#ff007f' : '#00f3ff';
+      }
+
+      gameOver(reason = "Neural link severed! Collision detected.") {
+        this.isRunning = false;
+        this.audio.playCrash();
+
+        // Screen shake
+        this.arenaWrapper.classList.add('shake');
+
+        // Populate Game Over Modal
+        this.deathReasonEl.textContent = reason;
+        this.finalScoreEl.textContent = this.score;
+        this.finalComboEl.textContent = `${this.maxComboReached}x`;
+        this.finalDevouredEl.textContent = this.targetsEaten;
+
+        setTimeout(() => {
+          this.gameOverOverlay.classList.add('active');
+        }, 500);
+      }
+
+      updateHUD() {
+        this.scoreValEl.textContent = this.score;
+        this.highScoreValEl.textContent = this.highScore;
+        this.eatenValEl.textContent = this.targetsEaten;
+        const speedMultiplier = (this.currentSpeed / this.baseSpeed).toFixed(1);
+        this.speedValEl.textContent = `${speedMultiplier}x`;
+
+        // Combo badge
+        if (this.combo > 1) {
+          this.comboBadgeEl.style.display = 'flex';
+          this.comboTextEl.textContent = `COMBO x${this.combo}`;
+        } else {
+          this.comboBadgeEl.style.display = 'none';
+        }
+      }
+
+      spawnAmbientLightning() {
+        const { offsetX, offsetY, cols, rows, gridSize } = this;
+        const totalW = cols * gridSize;
+        const totalH = rows * gridSize;
+
+        // Choose between wall discharge or snake spark
+        if (this.combo >= 2 && this.snake.length > 4 && Math.random() > 0.4) {
+          const idx1 = Math.floor(Math.random() * this.snake.length);
+          const idx2 = Math.floor(Math.random() * this.snake.length);
+          if (idx1 !== idx2) {
+            const seg1 = this.snake[idx1];
+            const seg2 = this.snake[idx2];
+            const p1x = offsetX + (seg1.x + 0.5) * gridSize;
+            const p1y = offsetY + (seg1.y + 0.5) * gridSize;
+            const p2x = offsetX + (seg2.x + 0.5) * gridSize;
+            const p2y = offsetY + (seg2.y + 0.5) * gridSize;
+            this.lightnings.push(new LightningArc(p1x, p1y, p2x, p2y, '#ffe600', 5));
+          }
+        } else {
+          const edge = Math.floor(Math.random() * 4);
+          let x1, y1, x2, y2;
+          if (edge === 0) { // Top
+            x1 = offsetX + Math.random() * totalW;
+            y1 = offsetY;
+            x2 = x1 + (Math.random() - 0.5) * 160;
+            y2 = offsetY;
+          } else if (edge === 1) { // Bottom
+            x1 = offsetX + Math.random() * totalW;
+            y1 = offsetY + totalH;
+            x2 = x1 + (Math.random() - 0.5) * 160;
+            y2 = offsetY + totalH;
+          } else if (edge === 2) { // Left
+            x1 = offsetX;
+            y1 = offsetY + Math.random() * totalH;
+            x2 = offsetX;
+            y2 = y1 + (Math.random() - 0.5) * 160;
+          } else { // Right
+            x1 = offsetX + totalW;
+            y1 = offsetY + Math.random() * totalH;
+            x2 = offsetX + totalW;
+            y2 = y1 + (Math.random() - 0.5) * 160;
+          }
+          const neonColors = ['#00f3ff', '#ff007f', '#9d00ff', '#ffe600'];
+          const color = neonColors[Math.floor(Math.random() * neonColors.length)];
+          this.lightnings.push(new LightningArc(x1, y1, x2, y2, color, 6));
+        }
+      }
+
+      /* =========================================================
+       *  SNAKE MOVEMENT STEP (Discrete Grid Updates)
+       * ========================================================= */
+      step() {
+        if (!this.isRunning || this.isPaused) return;
+
+        // Apply queued direction
+        if (this.inputQueue.length > 0) {
+          this.direction = this.inputQueue.shift();
+        }
+
+        // Calculate new Head position
+        let newHead = {
+          x: this.snake[0].x + this.direction.x,
+          y: this.snake[0].y + this.direction.y
+        };
+
+        // Wall Collision / Wrap Logic
+        if (this.wrapWalls) {
+          if (newHead.x < 0) newHead.x = this.cols - 1;
+          else if (newHead.x >= this.cols) newHead.x = 0;
+          if (newHead.y < 0) newHead.y = this.rows - 1;
+          else if (newHead.y >= this.rows) newHead.y = 0;
+        } else {
+          if (newHead.x < 0 || newHead.x >= this.cols || newHead.y < 0 || newHead.y >= this.rows) {
+            this.gameOver("Grid Boundary Breach! Armor incinerated.");
+            return;
+          }
+        }
+
+        // Self Collision Check
+        const selfHit = this.snake.some((seg, idx) => {
+          // ignore tail end if moving because tail will vacate unless eating
+          if (idx === this.snake.length - 1) return false;
+          return seg.x === newHead.x && seg.y === newHead.y;
+        });
+
+        if (selfHit) {
+          this.gameOver("Tail Feedback Loop! Viper consumed itself.");
+          return;
+        }
+
+        // Move snake forward
+        this.snake.unshift(newHead);
+
+        // Check if ate target
+        if (this.target && newHead.x === this.target.x && newHead.y === this.target.y) {
+          this.onEatTarget();
+          // We do NOT pop tail, so snake grows!
+        } else {
+          this.snake.pop(); // Standard move: discard tail segment
+        }
+
+        // Decrement spine wave ripple
+        if (this.spineWave > 0) {
+          this.spineWave -= 0.8;
+        }
+      }
+
+      /* =========================================================
+       *  MAIN RENDER & ANIMATION LOOP
+       * ========================================================= */
+      loop(currentTime) {
+        requestAnimationFrame((t) => this.loop(t));
+
+        if (!this.lastTime) this.lastTime = currentTime;
+        const dt = Math.min((currentTime - this.lastTime) / 1000, 0.1);
+        this.lastTime = currentTime;
+
+        // Update Timers
+        if (this.isRunning && !this.isPaused) {
+          // Combo Timeout Timer
+          if (this.comboTimer > 0) {
+            this.comboTimer -= dt;
+            if (this.comboTimer <= 0) {
+              this.combo = 0;
+              this.updateHUD();
+            }
+          }
+
+          // Multiplier Timer
+          if (this.multiplierTimer > 0) {
+            this.multiplierTimer -= dt;
+            if (this.multiplierTimer <= 0) {
+              this.scoreMultiplier = 1;
+            }
+          }
+
+          // Time Warp Timer
+          if (this.timeWarpTimer > 0) {
+            this.timeWarpTimer -= dt;
+            if (this.timeWarpTimer <= 0) {
+              const baseCalculatedSpeed = this.baseSpeed + Math.min(this.targetsEaten * 0.22, 14);
+              this.currentSpeed = baseCalculatedSpeed;
+              this.stepInterval = 1 / this.currentSpeed;
+              this.updateHUD();
+            }
+          }
+
+          // Step Accumulator
+          this.accumulator += dt;
+          while (this.accumulator >= this.stepInterval) {
+            this.step();
+            this.accumulator -= this.stepInterval;
+          }
+
+          // Ambient Lightning / Electric discharge timer
+          this.ambientZapTimer += dt;
+          if (this.ambientZapTimer > 1.8) {
+            this.ambientZapTimer = 0;
+            this.spawnAmbientLightning();
+          }
+        }
+
+        // Update VFX Systems
+        this.particles = this.particles.filter(p => p.update(dt));
+        this.shockwaves = this.shockwaves.filter(s => s.update(dt));
+        this.lightnings = this.lightnings.filter(l => l.update(dt));
+        this.floatingTexts = this.floatingTexts.filter(f => f.update(dt));
+
+        // Render Frame
+        this.render(currentTime);
+      }
+
+      render(timestamp) {
+        const { ctx, canvas } = this;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Draw Ambient Perspective Cyber Grid
+        this.drawCyberGrid(ctx, timestamp);
+
+        // 2. Draw Target
+        if (this.target) {
+          this.drawTarget(ctx, timestamp);
+        }
+
+        // 3. Draw Snake
+        if (this.snake.length > 0) {
+          this.drawSnake(ctx, timestamp);
+        }
+
+        // 4. Draw Shockwaves
+        this.shockwaves.forEach(sw => sw.draw(ctx));
+
+        // 4b. Draw Lightning Arcs
+        this.lightnings.forEach(l => l.draw(ctx));
+
+        // 5. Draw Particles
+        this.particles.forEach(p => p.draw(ctx));
+
+        // 6. Draw Floating Popups
+        this.floatingTexts.forEach(ft => ft.draw(ctx));
+
+        // 7. Arena Border Glow
+        this.drawArenaBorder(ctx);
+      }
+
+      drawCyberGrid(ctx, timestamp) {
+        const { offsetX, offsetY, cols, rows, gridSize } = this;
+        const totalW = cols * gridSize;
+        const totalH = rows * gridSize;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.05)';
+        ctx.lineWidth = 1;
+
+        // Grid lines
+        for (let c = 0; c <= cols; c++) {
+          const x = offsetX + c * gridSize;
+          ctx.beginPath();
+          ctx.moveTo(x, offsetY);
+          ctx.lineTo(x, offsetY + totalH);
+          ctx.stroke();
+        }
+
+        for (let r = 0; r <= rows; r++) {
+          const y = offsetY + r * gridSize;
+          ctx.beginPath();
+          ctx.moveTo(offsetX, y);
+          ctx.lineTo(offsetX + totalW, y);
+          ctx.stroke();
+        }
+
+        // Subtle glowing intersection dots
+        ctx.fillStyle = 'rgba(0, 243, 255, 0.18)';
+        for (let c = 0; c <= cols; c += 4) {
+          for (let r = 0; r <= rows; r += 4) {
+            ctx.beginPath();
+            ctx.arc(offsetX + c * gridSize, offsetY + r * gridSize, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+      }
+
+      drawArenaBorder(ctx) {
+        const { offsetX, offsetY, cols, rows, gridSize } = this;
+        const totalW = cols * gridSize;
+        const totalH = rows * gridSize;
+
+        ctx.save();
+        ctx.strokeStyle = this.wrapWalls ? 'rgba(0, 243, 255, 0.3)' : 'rgba(255, 0, 127, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = this.wrapWalls ? 'rgba(0, 243, 255, 0.5)' : 'rgba(255, 0, 127, 0.8)';
+        ctx.shadowBlur = 10;
+        ctx.strokeRect(offsetX, offsetY, totalW, totalH);
+        ctx.restore();
+      }
+
+      drawTarget(ctx, timestamp) {
+        const { target, offsetX, offsetY, gridSize } = this;
+        const cx = offsetX + (target.x + 0.5) * gridSize;
+        const cy = offsetY + (target.y + 0.5) * gridSize;
+
+        // Pulse scale
+        const pulse = Math.sin(timestamp * 0.007) * 0.18 + 0.95;
+        const radius = (gridSize * 0.38) * pulse;
+
+        ctx.save();
+
+        // Outer Aura
+        const grad = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 2.5);
+        grad.addColorStop(0, target.color);
+        grad.addColorStop(0.5, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inner glowing core
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = target.color;
+        ctx.shadowBlur = 20;
+        ctx.fill();
+
+        // Special icon or ring
+        if (target.type === 'quantum') {
+          ctx.strokeStyle = '#ffe600';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius * 1.5, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (target.type === 'supernova') {
+          ctx.strokeStyle = '#ff007f';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          const starRot = timestamp * 0.003;
+          for (let i = 0; i < 4; i++) {
+            const angle = starRot + (i * Math.PI / 2);
+            ctx.moveTo(cx + Math.cos(angle) * radius * 0.5, cy + Math.sin(angle) * radius * 0.5);
+            ctx.lineTo(cx + Math.cos(angle) * radius * 1.8, cy + Math.sin(angle) * radius * 1.8);
+          }
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      drawSnake(ctx, timestamp) {
+        const { snake, offsetX, offsetY, gridSize } = this;
+        const len = snake.length;
+
+        ctx.save();
+
+        // Draw body from tail to head
+        for (let i = len - 1; i >= 0; i--) {
+          const seg = snake[i];
+          const cx = offsetX + (seg.x + 0.5) * gridSize;
+          const cy = offsetY + (seg.y + 0.5) * gridSize;
+
+          const isHead = i === 0;
+          const progress = 1 - (i / len); // 1 at head, 0 at tail
+
+          // Creative Spine wave glow calculation: if eating wave is near this segment
+          const waveDist = Math.abs(i - (len - this.spineWave));
+          const waveGlow = waveDist < 2.5 ? (1 - waveDist / 2.5) : 0;
+
+          // Segment Radius: tapered slightly towards tail
+          const baseRadius = (gridSize * 0.42);
+          const segRadius = isHead 
+            ? baseRadius * 1.08 
+            : Math.max(gridSize * 0.22, baseRadius * (0.55 + 0.45 * progress)) + waveGlow * 3;
+
+          // Color gradient along snake body: Cyber Cyan -> Neon Pink -> Deep Purple
+          let segColor;
+          if (isHead) {
+            segColor = '#00f3ff';
+          } else if (waveGlow > 0.2) {
+            segColor = '#ffffff'; // White-hot energy wave passing through
+          } else {
+            // Neon gradient interpolation
+            segColor = i % 2 === 0 ? '#00f3ff' : '#ff007f';
+          }
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, segRadius, 0, Math.PI * 2);
+
+          ctx.fillStyle = segColor;
+          ctx.shadowColor = isHead ? '#00f3ff' : '#ff007f';
+          ctx.shadowBlur = isHead ? 24 : (10 + waveGlow * 18);
+          ctx.fill();
+
+          // Connect segments with sleek laser line
+          if (i > 0) {
+            const nextSeg = snake[i - 1];
+            // Check for wrap-around disconnect to not draw line across canvas
+            const isWrapped = Math.abs(seg.x - nextSeg.x) > 1 || Math.abs(seg.y - nextSeg.y) > 1;
+            if (!isWrapped) {
+              const ncx = offsetX + (nextSeg.x + 0.5) * gridSize;
+              const ncy = offsetY + (nextSeg.y + 0.5) * gridSize;
+              ctx.beginPath();
+              ctx.moveTo(cx, cy);
+              ctx.lineTo(ncx, ncy);
+              ctx.strokeStyle = segColor;
+              ctx.lineWidth = segRadius * 1.5;
+              ctx.stroke();
+            }
+          }
+
+          // Eyes & visor for the Head
+          if (isHead) {
+            const eyeDist = gridSize * 0.22;
+            const eyeSize = gridSize * 0.12;
+
+            // Eye offsets perpendicular to movement direction
+            let ox = -this.direction.y * eyeDist;
+            let oy = this.direction.x * eyeDist;
+            let fwdX = this.direction.x * (gridSize * 0.18);
+            let fwdY = this.direction.y * (gridSize * 0.18);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffe600';
+            ctx.shadowBlur = 10;
+
+            // Left eye
+            ctx.beginPath();
+            ctx.arc(cx + ox + fwdX, cy + oy + fwdY, eyeSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Right eye
+            ctx.beginPath();
+            ctx.arc(cx - ox + fwdX, cy - oy + fwdY, eyeSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.restore();
+      }
+    }
+
+    // Launch the game once DOM is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      window.game = new CyberSnakeGame();
+    });
+  </script>
+</body>
+</html>
